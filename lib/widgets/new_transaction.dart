@@ -1,14 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class NewTransaction extends StatelessWidget {
+class NewTransaction extends StatefulWidget {
 
 
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
   final Function addNewTx;
 
-  NewTransaction({super.key, required this.addNewTx});
+  NewTransaction({ required this.addNewTx});
+
+  @override
+  State<NewTransaction> createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
+  final titleController = TextEditingController();
+
+  final amountController = TextEditingController();
+
+  void submitData(){
+    final enteredTitle = titleController.text;
+    final enteredAmount = double.parse(amountController.text);
+
+    if(enteredTitle.isEmpty || enteredAmount <= 0){
+      return;
+    }
+    widget.addNewTx(enteredTitle, enteredAmount);
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,17 +40,16 @@ class NewTransaction extends StatelessWidget {
               decoration: const InputDecoration(labelText: "Title"),
               // onChanged: (val) => titleInput = val,
               controller: titleController,
+              onSubmitted: (_) => submitData(),
             ),
             TextField(
               decoration: const InputDecoration(labelText: "Amount"),
-              // onChanged: (val) => amountInput = val,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
               controller: amountController,
+              onSubmitted: (_) => submitData(),
             ),
             TextButton(
-                onPressed: () {
-                  addNewTx(titleController.text,
-                      double.parse(amountController.text),);
-                },
+                onPressed: submitData,
                 style: TextButton.styleFrom(primary: Colors.purple),
                 child: const Text(
                   "Add transaction!",
