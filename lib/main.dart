@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:personal_experience_app/widgets/chart.dart';
 import 'package:personal_experience_app/widgets/new_transaction.dart';
 import 'package:personal_experience_app/widgets/transaction_list.dart';
 
@@ -45,12 +46,19 @@ class _MyAppState extends State<MyApp> {
     ),
   ];
 
-  void _addNew(String title, double amount) {
+  List<Transaction> get _recentTransactions {
+    return _userTransaction.where((element) {
+      return element.date
+          .isAfter(DateTime.now().subtract(const Duration(days: 7)));
+    }).toList();
+  }
+
+  void _addNew(String title, double amount, DateTime choseDate) {
     final newTx = Transaction(
       id: DateTime.now.toString(),
       title: title,
       amount: amount,
-      date: DateTime.now(),
+      date: choseDate,
     );
     setState(() {
       _userTransaction.add(newTx);
@@ -68,15 +76,25 @@ class _MyAppState extends State<MyApp> {
           );
         });
   }
+  void _deleteTransaction(String id){
+    setState(() {
+      _userTransaction.removeWhere((element) => element.id == id);
+    });
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.amber,
-          fontFamily: "Quicksand"
+                primarySwatch: Colors.purple,
+                primaryColor: Colors.purple,
+                fontFamily: "Quicksand")
+            .copyWith(
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+                onPrimary: Colors.purple, primary: Colors.purple),
+          ),
         ),
         home: Scaffold(
           appBar: AppBar(
@@ -93,17 +111,8 @@ class _MyAppState extends State<MyApp> {
               // mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Card(
-                  elevation: 5,
-                  child: Container(
-                    width: double.infinity,
-                    height: 100,
-                    alignment: Alignment.center,
-                    color: Theme.of(context).primaryColor,
-                    child: const Text("Chart"),
-                  ),
-                ),
-                TransactionList(_userTransaction)
+                Chart(_recentTransactions),
+                TransactionList(_userTransaction,_deleteTransaction)
               ],
             ),
           ),

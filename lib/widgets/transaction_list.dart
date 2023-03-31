@@ -5,51 +5,42 @@ import '../model/transaction.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
+  final Function delete;
 
-  TransactionList(this.transactions, {super.key});
+  TransactionList(this.transactions, this.delete);
+
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 550,
       child: ListView.builder(
-        itemBuilder: (ctx,index) {
+        itemBuilder: (ctx, index) {
           return Card(
-            child: Row(
-              children: <Widget>[
-                Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.purple,
-                        width: 2,
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    child: Text(
-                      '\$ ${transactions[index].amount}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.purple,
-                      ),
-                    )),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      transactions[index].title,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      DateFormat().format( transactions[index].date),
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                )
-              ],
+            elevation: 5,
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 30,
+                child: Padding(
+                  padding: EdgeInsets.all(6),
+                  child: FittedBox(
+                    child: Text('\$ ${transactions[index].amount}'),
+                  ),
+                ),
+              ),
+              title: Text(
+                transactions[index].title,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                DateFormat.yMMMd().format(transactions[index].date),
+              ),
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                color: Theme.of(context).errorColor,
+                onPressed: () => delete(transactions[index].id),
+              ),
             ),
           );
         },
